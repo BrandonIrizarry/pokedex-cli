@@ -17,9 +17,13 @@ func cleanInput(text string) (words []string) {
 
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
+	prompt := "Pokedex > "
 
-	for scanner.Scan() {
-		fmt.Println(scanner.Text())
+	for fmt.Print(prompt); scanner.Scan(); fmt.Printf("\n%s", prompt) {
+		line := scanner.Text()
+		textTokens := cleanInput(line)
+
+		fmt.Printf("Your command was: %s", textTokens[0])
 	}
 
 	if err := scanner.Err(); err != nil {
