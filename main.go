@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/BrandonIrizarry/pokedexcli/internal/pokeapi"
 	"os"
 	"strings"
 )
@@ -37,6 +38,18 @@ func commandHelp() error {
 	return nil
 }
 
+func commandMap() error {
+	page, err := pokeapi.GetFirstPage()
+
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(page)
+
+	return nil
+}
+
 func main() {
 	// Define the registry here, in main.
 	commandRegistry["exit"] = cliCommand{
@@ -49,6 +62,12 @@ func main() {
 		name:        "help",
 		description: "Display names of commands with their descriptions",
 		callback:    commandHelp,
+	}
+
+	commandRegistry["map"] = cliCommand{
+		name:        "map",
+		description: "print a page",
+		callback:    commandMap,
 	}
 
 	fmt.Println("Welcome to the Pokedex!")
