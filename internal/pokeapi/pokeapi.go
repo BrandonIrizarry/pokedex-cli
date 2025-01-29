@@ -95,6 +95,8 @@ func loadFromURL(url string, page *Page) error {
 
 // Make a GET request to the given URL.
 func makeGETRequest(url string) (*http.Response, error) {
+	go pokecache.InitCacheCleanup(5000)
+
 	request, err := http.NewRequest("GET", url, nil)
 
 	if err != nil {

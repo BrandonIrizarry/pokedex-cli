@@ -46,7 +46,9 @@ func GetEntry(url string) ([]byte, bool) {
 	return what.bytes, true
 }
 
-func InitCacheCleanup(lifetime time.Duration) {
+func InitCacheCleanup(_lifetime int) {
+	lifetime := time.Duration(_lifetime) * time.Millisecond
+
 	ticker := time.NewTicker(lifetime)
 	defer ticker.Stop()
 
