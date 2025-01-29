@@ -29,6 +29,8 @@ func AddEntry(url string, bytes []byte) {
 	mutex.Lock()
 	cache[url] = entry
 	mutex.Unlock()
+
+	fmt.Printf("Added URL %s to cache\n", url)
 }
 
 // Fetch a cache entry (as its collection of bytes.)

@@ -3,6 +3,8 @@ package pokeapi
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/BrandonIrizarry/pokedexcli/internal/pokecache"
+	"io"
 	"net/http"
 )
 
@@ -66,23 +68,54 @@ func loadFromURL(url string, page *Page) error {
 		return fmt.Errorf("Fatal: page pointer is nil")
 	}
 
+	jsonBytes, found := pokecache.GetEntry(url)
+
+	if found {
+		fmt.Println("In the cache.")
+		return marshal(page, jsonBytes)
+	}
+
+	response, err := makeGETRequest(url)
+
+	if err != nil {
+		return err
+	}
+
+	jsonBytes, err = io.ReadAll(response.Body)
+
+	if err != nil {
+		return fmt.Errorf("Reading bytes from response failed: %v", err)
+	}
+
+	// Don't forget to add the url to the cache!
+	pokecache.AddEntry(url, jsonBytes)
+
+	return marshal(page, jsonBytes)
+}
+
+// Make a GET request to the given URL.
+func makeGETRequest(url string) (*http.Response, error) {
 	request, err := http.NewRequest("GET", url, nil)
 
 	if err != nil {
-		return fmt.Errorf("Fatal: %v", err)
+		return nil, fmt.Errorf("Fatal: failure creating connection: %v", err)
 	}
 
 	client := &http.Client{}
 	response, err := client.Do(request)
 
 	if err != nil {
-		return fmt.Errorf("Request failed: %v", err)
+		return nil, fmt.Errorf("Request failed: %v", err)
 	}
 
-	decoder := json.NewDecoder(response.Body)
+	return response, nil
+}
 
-	if err = decoder.Decode(page); err != nil {
-		return fmt.Errorf("Decoding failed: %v", err)
+// Marshal the given byte slice, representing JSON data, into the
+// given page.
+func marshal(page *Page, jsonBytes []byte) error {
+	if err := json.Unmarshal(jsonBytes, page); err != nil {
+		return err
 	}
 
 	return nil
