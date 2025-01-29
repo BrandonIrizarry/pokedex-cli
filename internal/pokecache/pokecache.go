@@ -52,9 +52,9 @@ func InitCacheCleanup(_lifetime int) {
 	ticker := time.NewTicker(lifetime)
 	defer ticker.Stop()
 
-	for range ticker.C {
+	for currentTime := range ticker.C {
 		for url, entry := range cache {
-			if time.Since(entry.timeOfCreation) > lifetime {
+			if currentTime.Sub(entry.timeOfCreation) >= lifetime {
 				mutex.Lock()
 				delete(cache, url)
 				mutex.Unlock()
