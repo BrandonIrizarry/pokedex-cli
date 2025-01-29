@@ -122,7 +122,8 @@ func main() {
 		// 'cliCommand' includes a func field which breaks
 		// comparability.
 		if what.name == "" {
-			break
+			fmt.Printf("Invalid command '%s'\n", command)
+			continue
 		}
 
 		if err := what.callback(&page); err != nil {
