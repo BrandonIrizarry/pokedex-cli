@@ -67,6 +67,12 @@ func commandMapBackward(page *pokeapi.Page) error {
 		return err
 	}
 
+	placeNames := pokeapi.GetPlaceNames(page)
+
+	for _, placeName := range placeNames {
+		fmt.Println(placeName)
+	}
+
 	return nil
 }
 
