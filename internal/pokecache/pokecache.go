@@ -55,7 +55,10 @@ func InitCacheCleanup(_lifetime int) {
 	for range ticker.C {
 		for url, entry := range cache {
 			if time.Since(entry.timeOfCreation) > lifetime {
+				mutex.Lock()
 				delete(cache, url)
+				mutex.Unlock()
+
 				fmt.Printf("Deleted URL %s from cache\n", url)
 			}
 		}
