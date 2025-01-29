@@ -20,6 +20,8 @@ type Page struct {
 
 var firstLoaded bool = false
 
+const pokeapiURL = "https://pokeapi.co/api/v2/location-area/?offset=0&limit=20"
+
 // Load the previous page in the sequence.
 func LoadPreviousURL(page *Page) error {
 	previousURL := page.Previous
@@ -38,7 +40,7 @@ func LoadNextURL(page *Page) error {
 	// results.
 	if !firstLoaded {
 		firstLoaded = true
-		return loadFromURL("https://pokeapi.co/api/v2/location-area/", page)
+		return loadFromURL(pokeapiURL, page)
 	}
 
 	nextURL := page.Next
