@@ -101,6 +101,7 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	prompt := "Pokedex > "
 
+	// This is where the currently loaded page will reside.
 	var page pokeapi.Page
 
 	for fmt.Print(prompt); scanner.Scan(); fmt.Printf("\n%s", prompt) {
