@@ -38,6 +38,7 @@ func commandHelp(page *pokeapi.Page) error {
 	return nil
 }
 
+// List the placenames found in the current page.
 func commandMapForward(page *pokeapi.Page) error {
 	err := pokeapi.LoadNextURL(page)
 
@@ -45,7 +46,11 @@ func commandMapForward(page *pokeapi.Page) error {
 		return err
 	}
 
-	fmt.Println(page)
+	placeNames := pokeapi.GetPlaceNames(page)
+
+	for _, placeName := range placeNames {
+		fmt.Println(placeName)
+	}
 
 	return nil
 }
