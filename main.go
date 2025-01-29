@@ -55,6 +55,21 @@ func commandMapForward(page *pokeapi.Page) error {
 	return nil
 }
 
+func commandMapBackward(page *pokeapi.Page) error {
+	if page.Previous == nil {
+		fmt.Println("You're on the first page.")
+		return nil
+	}
+
+	err := pokeapi.LoadPreviousURL(page)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func main() {
 	// Define the registry here, in main.
 	commandRegistry["exit"] = cliCommand{
@@ -71,8 +86,14 @@ func main() {
 
 	commandRegistry["map"] = cliCommand{
 		name:        "map",
-		description: "print a page",
+		description: "paginate forwards",
 		callback:    commandMapForward,
+	}
+
+	commandRegistry["mapb"] = cliCommand{
+		name:        "mapb",
+		description: "paginate backwards",
+		callback:    commandMapBackward,
 	}
 
 	fmt.Println("Welcome to the Pokedex!")
