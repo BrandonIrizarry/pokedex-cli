@@ -55,7 +55,8 @@ func InitCacheCleanup(_lifetime int) {
 	for range ticker.C {
 		for url, entry := range cache {
 			if time.Since(entry.timeOfCreation) > lifetime {
-				fmt.Printf("URL %s is old\n", url)
+				delete(cache, url)
+				fmt.Printf("Deleted URL %s from cache\n", url)
 			}
 		}
 	}
