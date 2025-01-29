@@ -19,17 +19,17 @@ func cleanInput(text string) (words []string) {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(*pokeapi.Page) error
 }
 
 var commandRegistry = make(map[string]cliCommand)
 
 // For now, this is just a dummy command.
-func commandExit() error {
+func commandExit(page *pokeapi.Page) error {
 	return nil
 }
 
-func commandHelp() error {
+func commandHelp(page *pokeapi.Page) error {
 	fmt.Printf("Usage:\n\n")
 	for commandName, clicmd := range commandRegistry {
 		fmt.Printf("%s: %s\n", commandName, clicmd.description)
@@ -38,8 +38,8 @@ func commandHelp() error {
 	return nil
 }
 
-func commandMap() error {
-	page, err := pokeapi.GetFirstPage()
+func commandMapForward(page *pokeapi.Page) error {
+	err := pokeapi.LoadNextURL(page)
 
 	if err != nil {
 		return err
@@ -67,13 +67,15 @@ func main() {
 	commandRegistry["map"] = cliCommand{
 		name:        "map",
 		description: "print a page",
-		callback:    commandMap,
+		callback:    commandMapForward,
 	}
 
 	fmt.Println("Welcome to the Pokedex!")
 
 	scanner := bufio.NewScanner(os.Stdin)
 	prompt := "Pokedex > "
+
+	var page pokeapi.Page
 
 	for fmt.Print(prompt); scanner.Scan(); fmt.Printf("\n%s", prompt) {
 		line := scanner.Text()
@@ -90,7 +92,7 @@ func main() {
 			break
 		}
 
-		if err := what.callback(); err != nil {
+		if err := what.callback(&page); err != nil {
 			fmt.Fprintf(os.Stderr, "Error in command '%s': %v\n", what.name, err)
 		}
 
