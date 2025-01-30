@@ -40,7 +40,18 @@ func commandHelp(page *pokeapi.OverworldPage) error {
 
 // List the placenames found in the current page.
 func commandMapForward(page *pokeapi.OverworldPage) error {
-	err := pokeapi.LoadNextURL(page)
+	var loader func(*pokeapi.OverworldPage) error
+
+	// If 'map' is called for the first time, we bootstrap into the
+	// forward/backward pagination by listing the first page of
+	// results.
+	if page.Next == nil {
+		loader = pokeapi.LoadFirstURL
+	} else {
+		loader = pokeapi.LoadNextURL
+	}
+
+	err := loader(page)
 
 	if err != nil {
 		return err
