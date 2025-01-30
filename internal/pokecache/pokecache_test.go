@@ -11,13 +11,13 @@ func TestAddGet(t *testing.T) {
 		someBytes   []byte
 	}{
 		{
-			description: "Test an arbitrary string (no HTTP request)",
+			description: "Add arbitrary string to cache",
 			url:         "grape juice",
 			someBytes:   []byte("fake JSON data"),
 		},
 
 		{
-			description: "Test another arbitrary string (no HTTP request)",
+			description: "Add another arbitrary string to cache",
 			url:         "orange juice",
 			someBytes:   []byte("more fake JSON data"),
 		},
