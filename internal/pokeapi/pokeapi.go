@@ -40,7 +40,7 @@ func LoadNextURL(page *Page) error {
 	// results.
 	if !firstLoaded {
 		firstLoaded = true
-		go pokecache.InitCacheCleanup(5000)
+		go pokecache.InitCacheCleanup(5000, nil)
 		return loadFromURL(pokeapiURL, page)
 	}
 

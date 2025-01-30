@@ -41,3 +41,31 @@ func TestAddGet(t *testing.T) {
 		})
 	}
 }
+
+func TestCacheCleanup(t *testing.T) {
+	const lifetimeMillis = 500
+	tick := make(chan struct{})
+
+	go InitCacheCleanup(lifetimeMillis, tick)
+
+	key := "cheeseburger"
+	AddEntry(key, []byte("bread, meat, and cheese"))
+
+	_, found := GetEntry(key)
+
+	if !found {
+		t.Errorf("Key '%s' shouldn't've been deleted yet", key)
+		return
+	}
+
+	// Wait for a tick to occur, so that anything that should be
+	// purged, will in fact be.
+	<-tick
+
+	_, found = GetEntry(key)
+
+	if found {
+		t.Errorf("Key '%s' should've been deleted already", key)
+		return
+	}
+}

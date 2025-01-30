@@ -46,13 +46,21 @@ func GetEntry(url string) ([]byte, bool) {
 	return what.bytes, true
 }
 
-func InitCacheCleanup(_lifetime int) {
+func InitCacheCleanup(_lifetime int, tick chan struct{}) {
 	lifetime := time.Duration(_lifetime) * time.Millisecond
 
 	ticker := time.NewTicker(lifetime)
 	defer ticker.Stop()
 
 	for currentTime := range ticker.C {
+		// Signal to the outside world that a check for cleaning up is
+		// to be performed.
+		//
+		// We mostly need this for our unit tests, so that the test
+		// runner doesn't finish without giving this loop a chance to
+		// potentially clean the cache.
+		tick <- struct{}{}
+
 		for url, entry := range cache {
 			if currentTime.Sub(entry.timeOfCreation) >= lifetime {
 				mutex.Lock()
