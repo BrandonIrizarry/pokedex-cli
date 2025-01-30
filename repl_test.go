@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"github.com/BrandonIrizarry/pokedexcli/internal/pokecache"
 	"testing"
 )
 
@@ -38,5 +40,43 @@ func TestCleanInput(t *testing.T) {
 				return
 			}
 		}
+	}
+}
+
+func TestAddGet(t *testing.T) {
+	// Note that this is in milliseconds.
+	const lifetime = 5000
+
+	testCases := []struct {
+		url       string
+		someBytes []byte
+	}{
+		{
+			url:       "https://example.com",
+			someBytes: []byte("fake JSON data"),
+		},
+
+		{
+			url:       "https://example.com/path",
+			someBytes: []byte("more fake JSON data"),
+		},
+	}
+
+	for i, testCase := range testCases {
+		t.Run(fmt.Sprintf("Test case %d", i), func(t *testing.T) {
+			pokecache.AddEntry(testCase.url, testCase.someBytes)
+
+			someBytes, found := pokecache.GetEntry(testCase.url)
+
+			if !found {
+				t.Errorf("URL not added to cache: '%s'", testCase.url)
+				return
+			}
+
+			if string(someBytes) != string(testCase.someBytes) {
+				t.Errorf("Data added to cache (%s) doesn't match retrieved data (%s)",
+					string(testCase.someBytes), string(someBytes))
+			}
+		})
 	}
 }
