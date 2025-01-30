@@ -5,20 +5,17 @@ import (
 )
 
 func TestCleanInput(t *testing.T) {
-	// Struct type-definition reflecting the signature of the function
-	// under test.
-	type testCase struct {
+	// Anonymous struct reflecting the signature of the function under
+	// test.
+	testCases := []struct {
 		input         string
 		expectedWords []string
-	}
-
-	testCases := []testCase{
-		testCase{
+	}{
+		{
 			input:         "  Hello World  ",
 			expectedWords: []string{"hello", "world"},
 		},
-
-		testCase{
+		{
 			input:         "Charmander Bulbasaur PIKACHU",
 			expectedWords: []string{"charmander", "bulbasaur", "pikachu"},
 		},
