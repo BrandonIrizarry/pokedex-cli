@@ -75,7 +75,7 @@ func loadFromURL(url string, page *Page) error {
 
 	if found {
 		fmt.Println("In the cache.")
-		return marshal(page, jsonBytes)
+		return unmarshal(page, jsonBytes)
 	}
 
 	response, err := makeGETRequest(url)
@@ -93,7 +93,7 @@ func loadFromURL(url string, page *Page) error {
 	// Don't forget to add the url to the cache!
 	pokecache.AddEntry(url, jsonBytes)
 
-	return marshal(page, jsonBytes)
+	return unmarshal(page, jsonBytes)
 }
 
 // Make a GET request to the given URL.
@@ -114,9 +114,9 @@ func makeGETRequest(url string) (*http.Response, error) {
 	return response, nil
 }
 
-// Marshal the given byte slice, representing JSON data, into the
+// Unmarshal the given byte slice, representing JSON data, into the
 // given page.
-func marshal(page *Page, jsonBytes []byte) error {
+func unmarshal(page *Page, jsonBytes []byte) error {
 	if err := json.Unmarshal(jsonBytes, page); err != nil {
 		return err
 	}
