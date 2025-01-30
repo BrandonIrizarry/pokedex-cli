@@ -59,7 +59,12 @@ func InitCacheCleanup(_lifetime int, tick chan struct{}) {
 		// We mostly need this for our unit tests, so that the test
 		// runner doesn't finish without giving this loop a chance to
 		// potentially clean the cache.
-		tick <- struct{}{}
+		//
+		// Outside of unit testing, 'tick' should be nil, and so we
+		// should check for this.
+		if tick != nil {
+			tick <- struct{}{}
+		}
 
 		for url, entry := range cache {
 			if currentTime.Sub(entry.timeOfCreation) >= lifetime {
