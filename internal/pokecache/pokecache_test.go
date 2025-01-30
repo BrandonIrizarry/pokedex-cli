@@ -5,9 +5,6 @@ import (
 )
 
 func TestAddGet(t *testing.T) {
-	// Note that this is in milliseconds.
-	const lifetime = 5000
-
 	testCases := []struct {
 		description string
 		url         string
