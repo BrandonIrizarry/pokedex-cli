@@ -19,17 +19,17 @@ func cleanInput(text string) (words []string) {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*pokeapi.Page) error
+	callback    func(*pokeapi.OverworldPage) error
 }
 
 var commandRegistry = make(map[string]cliCommand)
 
 // For now, this is just a dummy command.
-func commandExit(page *pokeapi.Page) error {
+func commandExit(page *pokeapi.OverworldPage) error {
 	return nil
 }
 
-func commandHelp(page *pokeapi.Page) error {
+func commandHelp(page *pokeapi.OverworldPage) error {
 	fmt.Printf("Usage:\n\n")
 	for commandName, clicmd := range commandRegistry {
 		fmt.Printf("%s: %s\n", commandName, clicmd.description)
@@ -39,7 +39,7 @@ func commandHelp(page *pokeapi.Page) error {
 }
 
 // List the placenames found in the current page.
-func commandMapForward(page *pokeapi.Page) error {
+func commandMapForward(page *pokeapi.OverworldPage) error {
 	err := pokeapi.LoadNextURL(page)
 
 	if err != nil {
@@ -55,7 +55,7 @@ func commandMapForward(page *pokeapi.Page) error {
 	return nil
 }
 
-func commandMapBackward(page *pokeapi.Page) error {
+func commandMapBackward(page *pokeapi.OverworldPage) error {
 	if page.Previous == nil {
 		fmt.Println("You're on the first page.")
 		return nil
@@ -108,7 +108,7 @@ func main() {
 	prompt := "Pokedex > "
 
 	// This is where the currently loaded page will reside.
-	var page pokeapi.Page
+	var page pokeapi.OverworldPage
 
 	for fmt.Print(prompt); scanner.Scan(); fmt.Printf("\n%s", prompt) {
 		line := scanner.Text()
