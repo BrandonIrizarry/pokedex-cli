@@ -20,6 +20,8 @@ type Page struct {
 
 var firstLoaded bool = false
 
+// We include query parameters here, since calls to 'mapb' from the
+// second page will add these anyway.
 const pokeapiURL = "https://pokeapi.co/api/v2/location-area/?offset=0&limit=20"
 
 // Load the previous page in the sequence.
