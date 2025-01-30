@@ -43,7 +43,7 @@ func TestAddGet(t *testing.T) {
 }
 
 func TestCacheCleanup(t *testing.T) {
-	const lifetimeMillis = 500
+	const lifetimeMillis = 5
 	tick := make(chan struct{})
 
 	go InitCacheCleanup(lifetimeMillis, tick)
