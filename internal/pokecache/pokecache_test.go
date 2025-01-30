@@ -68,4 +68,6 @@ func TestCacheCleanup(t *testing.T) {
 		t.Errorf("Key '%s' should've been deleted already", key)
 		return
 	}
+
+	close(tick)
 }
