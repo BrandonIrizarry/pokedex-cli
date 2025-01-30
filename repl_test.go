@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -29,7 +28,8 @@ func TestCleanInput(t *testing.T) {
 		actualWords := cleanInput(tcase.input)
 
 		if len(actualWords) != len(tcase.expectedWords) {
-			fmt.Errorf("Unequal result lengths")
+			t.Errorf("Unequal result lengths")
+			return
 		}
 
 		for i := 0; i < len(actualWords); i++ {
@@ -37,7 +37,8 @@ func TestCleanInput(t *testing.T) {
 			expectedWord := tcase.expectedWords[i]
 
 			if actualWord != expectedWord {
-				fmt.Errorf("Unequal words at position %d", i)
+				t.Errorf("Unequal words at position %d", i)
+				return
 			}
 		}
 	}
