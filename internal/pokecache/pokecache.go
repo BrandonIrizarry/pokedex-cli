@@ -20,23 +20,23 @@ var cache = make(map[string]cacheEntry)
 
 // Register some JSON bytes in the cache, using the 'cacheEntry'
 // format.
-func AddEntry(url string, bytes []byte) {
+func AddEntry(key string, bytes []byte) {
 	entry := cacheEntry{
 		timeOfCreation: time.Now(),
 		bytes:          bytes,
 	}
 
 	mutex.Lock()
-	cache[url] = entry
+	cache[key] = entry
 	mutex.Unlock()
 
-	fmt.Printf("Added URL %s to cache\n", url)
+	fmt.Printf("Added key %s to cache\n", key)
 }
 
 // Fetch a cache entry (as its collection of bytes.)
-func GetEntry(url string) ([]byte, bool) {
+func GetEntry(key string) ([]byte, bool) {
 	mutex.Lock()
-	what, ok := cache[url]
+	what, ok := cache[key]
 	mutex.Unlock()
 
 	if !ok {
@@ -66,13 +66,13 @@ func InitCacheCleanup(_lifetime int, tick chan struct{}) {
 			tick <- struct{}{}
 		}
 
-		for url, entry := range cache {
+		for key, entry := range cache {
 			if currentTime.Sub(entry.timeOfCreation) >= lifetime {
 				mutex.Lock()
-				delete(cache, url)
+				delete(cache, key)
 				mutex.Unlock()
 
-				fmt.Printf("Deleted URL %s from cache\n", url)
+				fmt.Printf("Deleted key %s from cache\n", key)
 			}
 		}
 	}
