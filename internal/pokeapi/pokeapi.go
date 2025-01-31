@@ -53,5 +53,5 @@ func GetPlaceNames(page *OverworldPage) (placeNames []string) {
 		placeNames = append(placeNames, result.Name)
 	}
 
-	return placeNames
+	return
 }
