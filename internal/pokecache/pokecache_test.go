@@ -58,8 +58,9 @@ func TestCacheCleanup(t *testing.T) {
 		return
 	}
 
-	// Wait for a tick to occur, so that anything that should be
+	// Wait for two ticks to occur, so that anything that should be
 	// purged, will in fact be.
+	<-tick
 	<-tick
 
 	_, found = GetEntry(key)
