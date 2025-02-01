@@ -61,7 +61,7 @@ func GetPlaceNames(page *OverworldPage) (placeNames []string) {
 func LoadRegionInfo(page *OverworldPage, regionInfo *RegionInfoPage, regionName string) error {
 	// This would only happen if we were on the first page, and
 	// haven't invoked the 'map' command yet.
-	if IsEmpty(page) {
+	if page.IsEmpty() {
 		err := LoadFirstURL(page)
 
 		if err != nil {

@@ -13,7 +13,7 @@ type OverworldPage struct {
 }
 
 // Return whether the given Page struct has been loaded yet.
-func IsEmpty(page *OverworldPage) bool {
+func (page *OverworldPage) IsEmpty() bool {
 	return page.Count == 0
 }
 
