@@ -80,3 +80,17 @@ func LoadRegionInfo(page *OverworldPage, regionInfo *RegionInfoPage, regionName 
 
 	return fmt.Errorf("Region '%s' not found", regionName)
 }
+
+func LoadPokemonFullData(regionInfo *RegionInfoPage, pokemonFullData *PokemonFullData, pokemonName string) error {
+	if regionInfo.IsEmpty() {
+		return fmt.Errorf("Region info hasn't been loaded yet")
+	}
+
+	for _, pokemonEncounter := range regionInfo.PokemonEncounters {
+		if pokemon := pokemonEncounter.Pokemon; pokemon.Name == pokemonName {
+			return loadFromURL(pokemon.URL, pokemonFullData)
+		}
+	}
+
+	return fmt.Errorf("Pokemon '%s' not found", pokemonName)
+}
