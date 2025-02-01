@@ -10,6 +10,11 @@ type OverworldPage struct {
 	} `json:"results"`
 }
 
+// Return whether the given Page struct has been loaded yet.
+func IsEmpty(page *OverworldPage) bool {
+	return page.Count == 0
+}
+
 type RegionInfoPage struct {
 	EncounterMethodRates []struct {
 		EncounterMethod struct {
