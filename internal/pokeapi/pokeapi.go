@@ -55,3 +55,15 @@ func GetPlaceNames(page *OverworldPage) (placeNames []string) {
 
 	return
 }
+
+// Search for 'regionName' among the Results structs, and load the
+// JSON data pointed to by the corresponding URL into 'regionInfo'
+func LoadRegionInfo(page *OverworldPage, regionInfo *RegionInfoPage, regionName string) error {
+	for _, result := range page.Results {
+		if result.Name == regionName {
+			return loadFromURL(result.URL, regionInfo)
+		}
+	}
+
+	return fmt.Errorf("Name '%s' not found", regionName)
+}

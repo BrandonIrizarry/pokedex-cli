@@ -19,17 +19,17 @@ func cleanInput(text string) (words []string) {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*pokeapi.OverworldPage) error
+	callback    func(*pokeapi.OverworldPage, *pokeapi.RegionInfoPage, ...string) error
 }
 
 var commandRegistry = make(map[string]cliCommand)
 
 // For now, this is just a dummy command.
-func commandExit(page *pokeapi.OverworldPage) error {
+func commandExit(_ *pokeapi.OverworldPage, _ *pokeapi.RegionInfoPage, _ ...string) error {
 	return nil
 }
 
-func commandHelp(page *pokeapi.OverworldPage) error {
+func commandHelp(_ *pokeapi.OverworldPage, _ *pokeapi.RegionInfoPage, _ ...string) error {
 	fmt.Printf("Usage:\n\n")
 	for commandName, clicmd := range commandRegistry {
 		fmt.Printf("%s: %s\n", commandName, clicmd.description)
@@ -39,7 +39,7 @@ func commandHelp(page *pokeapi.OverworldPage) error {
 }
 
 // List the placenames found in the current page.
-func commandMapForward(page *pokeapi.OverworldPage) error {
+func commandMapForward(page *pokeapi.OverworldPage, _ *pokeapi.RegionInfoPage, _ ...string) error {
 	var loader func(*pokeapi.OverworldPage) error
 
 	// If 'map' is called for the first time, we bootstrap into the
@@ -66,7 +66,7 @@ func commandMapForward(page *pokeapi.OverworldPage) error {
 	return nil
 }
 
-func commandMapBackward(page *pokeapi.OverworldPage) error {
+func commandMapBackward(page *pokeapi.OverworldPage, _ *pokeapi.RegionInfoPage, _ ...string) error {
 	if page.Previous == nil {
 		fmt.Println("You're on the first page.")
 		return nil
@@ -83,6 +83,23 @@ func commandMapBackward(page *pokeapi.OverworldPage) error {
 	for _, placeName := range placeNames {
 		fmt.Println(placeName)
 	}
+
+	return nil
+}
+
+func commandExplore(page *pokeapi.OverworldPage, regionInfo *pokeapi.RegionInfoPage, args ...string) error {
+	if len(args) != 1 {
+		fmt.Printf("Wrong number of arguments to 'explore': %v\n", len(args))
+		return nil
+	}
+
+	err := pokeapi.LoadRegionInfo(page, regionInfo, args[0])
+
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(regionInfo)
 
 	return nil
 }
@@ -113,6 +130,12 @@ func main() {
 		callback:    commandMapBackward,
 	}
 
+	commandRegistry["explore"] = cliCommand{
+		name:        "explore",
+		description: "list the pokemon found in the place-name given as the first argument",
+		callback:    commandExplore,
+	}
+
 	fmt.Println("Welcome to the Pokedex!")
 
 	scanner := bufio.NewScanner(os.Stdin)
@@ -121,10 +144,19 @@ func main() {
 	// This is where the currently loaded page will reside.
 	var page pokeapi.OverworldPage
 
+	// This is where we will keep information about the current
+	// region.
+	var regionInfo pokeapi.RegionInfoPage
+
 	for fmt.Print(prompt); scanner.Scan(); fmt.Printf("\n%s", prompt) {
 		line := scanner.Text()
 		textTokens := cleanInput(line)
 		command := textTokens[0]
+
+		// This slice holds the arguments passed to the given command
+		// (e.g., the name of region to explore when invoking
+		// 'explore'.)
+		args := textTokens[1:]
 
 		what := commandRegistry[command]
 
@@ -137,7 +169,7 @@ func main() {
 			continue
 		}
 
-		if err := what.callback(&page); err != nil {
+		if err := what.callback(&page, &regionInfo, args...); err != nil {
 			fmt.Fprintf(os.Stderr, "Error in command '%s': %v\n", what.name, err)
 		}
 
