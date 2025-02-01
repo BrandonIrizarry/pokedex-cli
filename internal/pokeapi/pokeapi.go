@@ -78,5 +78,5 @@ func LoadRegionInfo(page *OverworldPage, regionInfo *RegionInfoPage, regionName 
 		}
 	}
 
-	return fmt.Errorf("Name '%s' not found", regionName)
+	return fmt.Errorf("Region '%s' not found", regionName)
 }
