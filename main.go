@@ -16,20 +16,26 @@ func cleanInput(text string) (words []string) {
 	return words
 }
 
+type Payload struct {
+	page            pokeapi.OverworldPage
+	regionInfo      pokeapi.RegionInfoPage
+	pokemonFullData pokeapi.PokemonFullData
+}
+
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*pokeapi.OverworldPage, *pokeapi.RegionInfoPage, ...string) error
+	callback    func(*Payload, ...string) error
 }
 
 var commandRegistry = make(map[string]cliCommand)
 
 // For now, this is just a dummy command.
-func commandExit(_ *pokeapi.OverworldPage, _ *pokeapi.RegionInfoPage, _ ...string) error {
+func commandExit(_ *Payload, _ ...string) error {
 	return nil
 }
 
-func commandHelp(_ *pokeapi.OverworldPage, _ *pokeapi.RegionInfoPage, _ ...string) error {
+func commandHelp(_ *Payload, _ ...string) error {
 	fmt.Printf("Usage:\n\n")
 	for commandName, clicmd := range commandRegistry {
 		fmt.Printf("%s: %s\n", commandName, clicmd.description)
@@ -39,8 +45,9 @@ func commandHelp(_ *pokeapi.OverworldPage, _ *pokeapi.RegionInfoPage, _ ...strin
 }
 
 // List the placenames found in the current page.
-func commandMapForward(page *pokeapi.OverworldPage, _ *pokeapi.RegionInfoPage, _ ...string) error {
+func commandMapForward(payload *Payload, _ ...string) error {
 	var loader func(*pokeapi.OverworldPage) error
+	page := &payload.page
 
 	// If 'map' is called for the first time, we bootstrap into the
 	// forward/backward pagination by listing the first page of
@@ -66,7 +73,9 @@ func commandMapForward(page *pokeapi.OverworldPage, _ *pokeapi.RegionInfoPage, _
 	return nil
 }
 
-func commandMapBackward(page *pokeapi.OverworldPage, _ *pokeapi.RegionInfoPage, _ ...string) error {
+func commandMapBackward(payload *Payload, _ ...string) error {
+	page := &payload.page
+
 	if page.Previous == nil {
 		fmt.Println("You're on the first page.")
 		return nil
@@ -87,19 +96,23 @@ func commandMapBackward(page *pokeapi.OverworldPage, _ *pokeapi.RegionInfoPage, 
 	return nil
 }
 
-func commandExplore(page *pokeapi.OverworldPage, regionInfo *pokeapi.RegionInfoPage, args ...string) error {
+func commandExplore(payload *Payload, args ...string) error {
 	if len(args) != 1 {
 		fmt.Printf("Wrong number of arguments to 'explore': %v\n", len(args))
 		return nil
 	}
 
-	err := pokeapi.LoadRegionInfo(page, regionInfo, args[0])
+	page := &payload.page
+	regionInfo := &payload.regionInfo
+
+	regionName := args[0]
+	err := pokeapi.LoadRegionInfo(page, regionInfo, regionName)
 
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("Exploring pastoria-city-area...")
+	fmt.Printf("Exploring %s...", regionName)
 	fmt.Println("Found Pokemon:")
 
 	for _, pokemonEncounter := range regionInfo.PokemonEncounters {
@@ -146,12 +159,8 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	prompt := "Pokedex > "
 
-	// This is where the currently loaded page will reside.
-	var page pokeapi.OverworldPage
-
-	// This is where we will keep information about the current
-	// region.
-	var regionInfo pokeapi.RegionInfoPage
+	// This is where all the currently loaded stuff resides.
+	var payload Payload
 
 	for fmt.Print(prompt); scanner.Scan(); fmt.Printf("\n%s", prompt) {
 		line := scanner.Text()
@@ -174,7 +183,7 @@ func main() {
 			continue
 		}
 
-		if err := what.callback(&page, &regionInfo, args...); err != nil {
+		if err := what.callback(&payload, args...); err != nil {
 			fmt.Fprintf(os.Stderr, "Error in command '%s': %v\n", what.name, err)
 		}
 
