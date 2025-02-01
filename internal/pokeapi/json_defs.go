@@ -70,6 +70,10 @@ type RegionInfoPage struct {
 	} `json:"pokemon_encounters"`
 }
 
+func (regionInfo *RegionInfoPage) IsEmpty() bool {
+	return regionInfo.ID == 0
+}
+
 // This is the struct we'll use to unmarshal Pokemon when making the
 // relevant API call.
 type PokemonFullData struct {
