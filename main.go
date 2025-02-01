@@ -30,6 +30,9 @@ type cliCommand struct {
 
 var commandRegistry = make(map[string]cliCommand)
 
+// Our final Pokedex.
+var pokedex = make(map[string]pokeapi.PokemonData)
+
 // For now, this is just a dummy command.
 func commandExit(_ *Payload, _ ...string) error {
 	return nil
@@ -122,6 +125,43 @@ func commandExplore(payload *Payload, args ...string) error {
 	return nil
 }
 
+func commandCatch(payload *Payload, args ...string) error {
+	if len(args) != 1 {
+		fmt.Printf("Wrong number of arguments to 'catch': %v\n", len(args))
+	}
+
+	regionInfo := &payload.regionInfo
+	pokemonFullData := &payload.pokemonFullData
+
+	if regionInfo.IsEmpty() {
+		fmt.Println("You need to explore a region first with 'explore <region name>'")
+		return nil
+	}
+
+	pokemonName := args[0]
+
+	// For now, we treat an attempt to catch a nonexistent pokemon as
+	// an error.
+	err := pokeapi.LoadPokemonFullData(regionInfo, pokemonFullData, pokemonName)
+
+	if err != nil {
+		return err
+	}
+
+	caught := pokeapi.CatchPokemon(pokemonFullData)
+	fmt.Printf("Throwing a ball at %s...\n", pokemonName)
+
+	if caught {
+		fmt.Printf("%s was caught!", pokemonName)
+		pokemonData := pokeapi.ExtractPokemonData(pokemonFullData)
+		pokedex[pokemonName] = pokemonData
+	} else {
+		fmt.Printf("%s escaped!", pokemonName)
+	}
+
+	return nil
+}
+
 func main() {
 	// Define the registry here, in main.
 	commandRegistry["exit"] = cliCommand{
@@ -152,6 +192,12 @@ func main() {
 		name:        "explore",
 		description: "list the pokemon found in the place-name given as the first argument",
 		callback:    commandExplore,
+	}
+
+	commandRegistry["catch"] = cliCommand{
+		name:        "catch",
+		description: "catch a Pokemon (only can be done when a map has been loaded)",
+		callback:    commandCatch,
 	}
 
 	fmt.Println("Welcome to the Pokedex!")
