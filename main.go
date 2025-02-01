@@ -99,8 +99,11 @@ func commandExplore(page *pokeapi.OverworldPage, regionInfo *pokeapi.RegionInfoP
 		return err
 	}
 
+	fmt.Println("Exploring pastoria-city-area...")
+	fmt.Println("Found Pokemon:")
+
 	for _, pokemonEncounter := range regionInfo.PokemonEncounters {
-		fmt.Println(pokemonEncounter.Pokemon.Name)
+		fmt.Printf("- %s\n", pokemonEncounter.Pokemon.Name)
 	}
 
 	return nil
