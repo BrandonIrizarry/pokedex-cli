@@ -99,7 +99,9 @@ func commandExplore(page *pokeapi.OverworldPage, regionInfo *pokeapi.RegionInfoP
 		return err
 	}
 
-	fmt.Println(regionInfo)
+	for _, pokemonEncounter := range regionInfo.PokemonEncounters {
+		fmt.Println(pokemonEncounter.Pokemon.Name)
+	}
 
 	return nil
 }
