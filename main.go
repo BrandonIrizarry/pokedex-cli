@@ -196,6 +196,16 @@ func commandInspect(payload *Payload, args ...string) error {
 	return nil
 }
 
+func commandPokedex(payload *Payload, args ...string) error {
+	fmt.Println("Your Pokedex:")
+
+	for name := range pokedex {
+		fmt.Printf("\t- %s\n", name)
+	}
+
+	return nil
+}
+
 func main() {
 	// Define the registry here, in main.
 	commandRegistry["exit"] = cliCommand{
@@ -238,6 +248,12 @@ func main() {
 		name:        "inspect",
 		description: "display stats of one of your caught pokemon",
 		callback:    commandInspect,
+	}
+
+	commandRegistry["pokedex"] = cliCommand{
+		name:        "pokedex",
+		description: "list the names of all your caught pokemon",
+		callback:    commandPokedex,
 	}
 
 	fmt.Println("Welcome to the Pokedex!")
