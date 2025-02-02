@@ -162,6 +162,40 @@ func commandCatch(payload *Payload, args ...string) error {
 	return nil
 }
 
+func commandInspect(payload *Payload, args ...string) error {
+	if len(args) != 1 {
+		fmt.Printf("Wrong number of arguments to 'catch': %v\n", len(args))
+	}
+
+	pokemonName := args[0]
+	pokemonInfo, ok := pokedex[pokemonName]
+
+	if !ok {
+		fmt.Println("you have not caught that pokemon")
+		return nil
+	}
+
+	fmt.Printf("Name: %s\n", pokemonInfo.Name)
+	fmt.Printf("Height: %d\n", pokemonInfo.Height)
+	fmt.Printf("Weight: %d\n", pokemonInfo.Weight)
+
+	fmt.Println("Stats:")
+	fmt.Printf("\t-hp: %d\n", pokemonInfo.Stats.HP)
+	fmt.Printf("\t-attack: %d\n", pokemonInfo.Stats.Attack)
+	fmt.Printf("\t-defense: %d\n", pokemonInfo.Stats.Defense)
+	fmt.Printf("\t-special-attack: %d\n", pokemonInfo.Stats.SpecialAttack)
+	fmt.Printf("\t-special-defense: %d\n", pokemonInfo.Stats.SpecialDefense)
+	fmt.Printf("\t-speed: %d\n", pokemonInfo.Stats.Speed)
+
+	fmt.Println("Types:")
+
+	for _, t := range pokemonInfo.Types {
+		fmt.Printf("\t- %s\n", t)
+	}
+
+	return nil
+}
+
 func main() {
 	// Define the registry here, in main.
 	commandRegistry["exit"] = cliCommand{
@@ -198,6 +232,12 @@ func main() {
 		name:        "catch",
 		description: "catch a Pokemon (only can be done when a map has been loaded)",
 		callback:    commandCatch,
+	}
+
+	commandRegistry["inspect"] = cliCommand{
+		name:        "inspect",
+		description: "display stats of one of your caught pokemon",
+		callback:    commandInspect,
 	}
 
 	fmt.Println("Welcome to the Pokedex!")
